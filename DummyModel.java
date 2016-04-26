@@ -4,19 +4,21 @@ import java.util.List;
 
 public class DummyModel implements IBouncingBallsModel {
 
+
+	private static final int NBROFBALLS = 4;
 	private final double areaWidth;
 	private final double areaHeight;
+	private double gravityConstant = 9.82;
+	private List<Ball> myBalls;
+	private double speedX = 5.0;
 
-	private double x, y, vx, vy, r;
+
 
 	public DummyModel(double width, double height) {
 		this.areaWidth = width;
 		this.areaHeight = height;
-		x = 1;
-		y = 1;
-		vx = 2.3;
-		vy = 1;
-		r = 1;
+		this.myBalls = new List<>();
+		initBalls();
 	}
 
 	@Override
@@ -29,12 +31,25 @@ public class DummyModel implements IBouncingBallsModel {
 		}
 		x += vx * deltaT;
 		y += vy * deltaT;
+
 	}
+
+
+	/**
+	 * Initializes the ball list
+	 */
+	private void initBalls() {
+		for (int i = 0; i<NBROFBALLS; i++) {
+			double startX = Random.rand()*areaWidth;
+			double startY = Random.rand()*areaHeight;
+			double vX = Random.rand()*speedX;
+
+		}
+	}
+
 
 	@Override
 	public List<Ellipse2D> getBalls() {
-		List<Ellipse2D> myBalls = new LinkedList<Ellipse2D>();
-		myBalls.add(new Ellipse2D.Double(x - r, y - r, 2 * r, 2 * r));
 		return myBalls;
 	}
 }
