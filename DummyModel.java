@@ -11,6 +11,8 @@ public class DummyModel implements IBouncingBallsModel {
 	private double gravityConstant = 9.82;
 	private List<Ball> myBalls;
 	private double speedX = 5.0;
+	private static final double maxRadius = 20.0;
+	private static final double density = 5.1;
 
 
 
@@ -40,12 +42,15 @@ public class DummyModel implements IBouncingBallsModel {
 	 */
 	private void initBalls() {
 		for (int i = 0; i<NBROFBALLS; i++) {
-			double startX = Random.rand()*areaWidth;
-			double startY = Random.rand()*areaHeight;
+			double radius = Random.rand()*maxRadius;
+			double startX = Random.rand()*(areaWidth-40)+20;
+			double startY = Random.rand()*(areaHeight-40)+20;
+			double weight = radius*radius*3,14*density;
 			double vX = Random.rand()*speedX;
 
 		}
 	}
+
 
 
 	@Override
