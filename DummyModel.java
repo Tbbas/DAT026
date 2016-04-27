@@ -6,7 +6,7 @@ import java.util.List;
 public class DummyModel implements IBouncingBallsModel {
 
 
-	private static final int NBROFBALLS = 2;
+	private static final int NBROFBALLS = 10;
 	private final double areaWidth;
 	private final double areaHeight;
 	private double gravityConstant = 9.82;
@@ -100,11 +100,15 @@ public class DummyModel implements IBouncingBallsModel {
 			colliding = true;
 
 		}
-		if (ball.getY() <= ball.getRadius() || ball.getY() >= areaHeight - ball.getRadius() || ball.getY() <= ball.getRadius()) {
+		if (ball.getY()-ball.getRadius() <= 0) {
             ball.setvY(ball.getvY()*-1);
 			ball.setY(ball.getRadius());
             colliding =true;
         }
+		if(ball.getY() + ball.getRadius() >= areaHeight) {
+			ball.setvY(ball.getvY()*-1);
+			ball.setY(areaHeight-ball.getRadius());
+		}
         return colliding;
 	}
 
