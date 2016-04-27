@@ -23,11 +23,14 @@ public class Ball {
         this.vX = vX;
         this.vY = 0;
 
-        color = new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
+        color = new Color(255,0,0);//new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
     }
 
     public Color getColor() {
         return color;
+    }
+    public void setColor(Color color){
+        this.color = color;
     }
 
     public double getRadius() {
@@ -78,5 +81,9 @@ public class Ball {
     }
     public Vector getVect(){
         return new Vector(vX,vY,x,y);
+    }
+
+    public double getSpeed() {
+        return Math.sqrt(Math.pow(vX, 2) + Math.pow(vY,2));
     }
 }
