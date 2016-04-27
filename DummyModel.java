@@ -6,13 +6,13 @@ import java.util.List;
 public class DummyModel implements IBouncingBallsModel {
 
 
-	private static final int NBROFBALLS = 10;
+	private static final int NBROFBALLS = 2;
 	private final double areaWidth;
 	private final double areaHeight;
 	private double gravityConstant = 9.82;
 	private ArrayList<Ball> myBalls;
 	private double speedX = 5.0;
-	private static final double maxRadius = 4.0;
+	private static final double maxRadius = 2.0;
 	private static final double density = 5.1;
 
 	private final Random r;
@@ -89,12 +89,20 @@ public class DummyModel implements IBouncingBallsModel {
 
 	private boolean checkWalls(Ball ball) {
         boolean colliding = false;
-		if (ball.getX() < ball.getRadius() || ball.getX() > areaWidth - ball.getRadius()) {
+		if (ball.getX() <= ball.getRadius()) {
             ball.setvX(ball.getvX()*-1);
+			ball.setX(ball.getRadius());
             colliding = true;
         }
-		if (ball.getY() < ball.getRadius() || ball.getY() > areaHeight - ball.getRadius() || ball.getY() < ball.getRadius()) {
+		if(ball.getX() >= areaWidth - ball.getRadius()) {
+			ball.setvX(ball.getvX()*-1);
+			ball.setX(areaWidth-ball.getRadius());
+			colliding = true;
+
+		}
+		if (ball.getY() <= ball.getRadius() || ball.getY() >= areaHeight - ball.getRadius() || ball.getY() <= ball.getRadius()) {
             ball.setvY(ball.getvY()*-1);
+			ball.setY(ball.getRadius());
             colliding =true;
         }
         return colliding;
