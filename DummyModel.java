@@ -14,8 +14,9 @@ public class DummyModel implements IBouncingBallsModel {
 	private double speedX = 5.0;
 	private static final double maxRadius = 2.0;
 	private static final double density = 5.1;
-    private boolean[][] collisionMatrix;
 	private final Random r;
+
+    private boolean[][] collisionMatrix;
 
 
 	public DummyModel(double width, double height) {
@@ -24,9 +25,9 @@ public class DummyModel implements IBouncingBallsModel {
 		this.areaWidth = width;
 		this.areaHeight = height;
 		this.myBalls = new ArrayList<Ball>();
-        for(int i=0;i<NBROFBALLS;i++){
-            for(int j=0;j<NBROFBALLS;j++){
-                collisionMatrix[i][j]=false;
+        for(int i=0; i<NBROFBALLS;i++){
+            for(int j=0; j<NBROFBALLS;j++){
+                collisionMatrix[i][j] = false;
             }
         }
 		initBalls();
@@ -34,42 +35,54 @@ public class DummyModel implements IBouncingBallsModel {
 
 	@Override
 	public void tick(double deltaT) {
+        for(int i=0; i<NBROFBALLS;i++){
+            for(int j=0; j<NBROFBALLS;j++){
+                collisionMatrix[i][j] = false;
+            }
+        }
+		for (Ball ball : myBalls) {
+			checkForCollisions(ball, deltaT);
+		}
         for (Ball ball : myBalls) {
             ball.setvY(ball.getvY() - gravityConstant * deltaT);
             ball.move(ball.getvX() * deltaT, ball.getvY() * deltaT);
         }
-		for (Ball ball : myBalls) {
-			checkForCollisions(ball);
-		}
 	}
 
-	private void checkForCollisions(Ball ball) {
-		checkWalls(ball);
-        checkOtherBalls(ball);
-	}
-
-	private boolean checkOtherBalls(Ball original) {
+	private void checkForCollisions(Ball ball, double deltaT) {
+        checkOtherBalls(ball, deltaT);
+        checkWalls(ball);
+    }
+    private boolean checkColliding(Ball original){
         boolean colliding = false;
-        for(int i=0;i<NBROFBALLS;i++){
-            for(int j=0;j<NBROFBALLS;j++){
-                collisionMatrix[i][j]=false;
+        for (Ball ball: myBalls) {
+            if(!ball.equals(original)){
+                //check if colliding
+                if(colliding(ball, original)){
+                    colliding = true;
+                }
             }
         }
+        return colliding;
+    }
+	private boolean checkOtherBalls(Ball original, double deltaT) {
+        boolean colliding = false;
 		for (Ball ball: myBalls) {
 			if(!ball.equals(original)){
 				//check if colliding
-				if(colliding(ball, original) && !collisionMatrix[myBalls.indexOf(original)][myBalls.indexOf(ball)] && !collisionMatrix[myBalls.indexOf(ball)][myBalls.indexOf(original)]){
+				if(colliding(ball, original) && !collisionMatrix[myBalls.indexOf(ball)][myBalls.indexOf(original)]){
                     colliding = true;
 					//do collision
-					collide(ball, original);
-				}
+					collide(ball, original, deltaT);
+                    collisionMatrix[myBalls.indexOf(ball)][myBalls.indexOf(original)] = true;
+                    collisionMatrix[myBalls.indexOf(original)][myBalls.indexOf(ball)] = true;
+				}else{
+                    collisionMatrix[myBalls.indexOf(ball)][myBalls.indexOf(original)] = false;
+                    collisionMatrix[myBalls.indexOf(original)][myBalls.indexOf(ball)] = false;
+                }
 			}
         }
-        if(colliding){
-            original.setColor(new Color(0, 255, 0));
-        }else{
-            original.setColor(new Color(255, 0, 0));
-        }
+
         return colliding;
 	}
 
@@ -80,7 +93,7 @@ public class DummyModel implements IBouncingBallsModel {
                 distance;
 	}
 
-	private void collide(Ball a, Ball b) {
+	private void collide(Ball a, Ball b, double deltaT) {
         double I = a.getWeight()*a.getSpeed() + b.getWeight()*b.getSpeed();
         double R = a.getSpeed() - b.getSpeed();
         double originX = a.getX();
@@ -96,8 +109,14 @@ public class DummyModel implements IBouncingBallsModel {
         b.setvX(newVelBX);
         b.setvY(newVelBY);
 
-        collisionMatrix[myBalls.indexOf(a)][myBalls.indexOf(b)] = true;
-        collisionMatrix[myBalls.indexOf(b)][myBalls.indexOf(a)] = true;
+        double angleA = Math.atan2(newVelAY, newVelAX);
+        double angleB = Math.atan2(newVelBY, newVelBX);
+        double distance = Math.abs(a.getRadius() + b.getRadius() - Math.sqrt(Math.pow(b.getX()-a.getX(),2)+Math.pow(b.getY() - a.getY(),2)));
+        a.move(Math.cos(angleA)*(distance/2), Math.sin(angleA)*(distance/2));
+        b.move(Math.cos(angleB)*(distance/2), Math.sin(angleB)*(distance/2));
+        System.out.println(
+                "Total distance needed to move: " + distance + "\n "+myBalls.indexOf(a)+" moving in X: " + Math.cos(angleA)*(distance/2) + ", in Y: " + Math.sin(angleA)*(distance/2) +  "\n "+ myBalls.indexOf(b)+" moving in X: " + Math.cos(angleB)*(distance/2) + ", in Y: " + Math.sin(angleB)*(distance/2) + "\n Distance needed to move after: " + (a.getRadius() + b.getRadius() - Math.sqrt(Math.pow(b.getX()-a.getX(),2)+Math.pow(b.getY() - a.getY(),2)))
+        );
     }
 
 	private boolean checkWalls(Ball ball) {
@@ -130,15 +149,17 @@ public class DummyModel implements IBouncingBallsModel {
 	 * Initializes the ball list
 	 */
 	private void initBalls() {
-        boolean colliding=true;
+        double wall = 10;
 		for (int i = 0; i<NBROFBALLS;i++) {
             double radius = r.nextDouble() * maxRadius + 0.5;
-            double startX = r.nextDouble() * (areaWidth - 40) + 20;
-            double startY = r.nextDouble() * (areaWidth - 40) + 20;
+            double startX = radius + wall;
+            wall = startX+radius;
+            double startY = radius + (i%5)*5;
             double weight = radius * radius * 3.14 * density;
             double vX = r.nextDouble() * speedX;
             Ball ball = new Ball(radius, startX, startY, weight, vX);
             myBalls.add(ball);
+
 		}
 	}
 

@@ -9,7 +9,7 @@ public class Main {
     JFrame frame = new JFrame();
     frame.setLayout(new GridLayout(1, 1));
     frame.add(appletClass);
-    frame.setMinimumSize(new Dimension(800, 800));
+    frame.setMinimumSize(new Dimension(1200, 1600));
 
     frame.setVisible(true);
 

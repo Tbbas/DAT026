@@ -23,7 +23,7 @@ public class Ball {
         this.vX = vX;
         this.vY = 0;
 
-        color = new Color(255,0,0);//new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
+        color = new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
     }
 
     public Color getColor() {
